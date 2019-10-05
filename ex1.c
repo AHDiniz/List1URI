@@ -32,8 +32,19 @@ int main(void)
 		{
 			char u, v;
 			scanf("%c %c\n", &u, &v);
-			g.adj[(u - 97) * n + (v - 97)] = 1;
+			g.adj[((int)u - 97) * n + ((int)v - 97)] = 1;
 		}
+
+		int col, row;
+		for (col = 0; col < n; ++col)
+		{
+			for (row = 0; row < n; ++row)
+			{
+				if (g.adj[col * n + row] != 1 && g.adj[col * n + row] != 0)
+					g.adj[col * n + row] = 0;
+			}
+		}
+
 		printf("%d connected components\n\n", ConnectedComponents(g));
 		DestroyGraph(g);
 	}
@@ -80,7 +91,7 @@ void DepthFirstSearch(Graph *g, int v)
 {
 	g->visited[v] = true;
 
-	printf("%d, ", v);
+	printf("%c, ", ((char)v + 97));
 
 	int i;
 	for (i = 0; i < g->n; ++i)
