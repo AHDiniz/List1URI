@@ -41,7 +41,7 @@ int main(void)
 			for (row = 0; row < n; ++row)
 			{
 				if (g.adj[col * n + row] != 1 && g.adj[col * n + row] != 0)
-					g.adj[col * n + row] = 0;
+					g.adj[col * n + row] = 1;
 			}
 		}
 
