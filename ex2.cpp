@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <limits>
+#include <climits>
 
 class Graph
 {
@@ -12,7 +12,7 @@ public:
 	int get(int u, int v);
 	int cost(int k);
 private:
-	int dijkstra(int k, int c);
+	int dijkstra(int k, int i);
 
 	int n, m, c;
 	std::vector<int> adj;
@@ -67,33 +67,59 @@ int Graph::get(int u, int v)
 int Graph::cost(int k)
 {
 	std::vector<int> costs;
+	costs.push_back(dijkstra(k, c));
 	for (int i = 0; i < c; ++i)
-		costs.push_back(dijkstra(k, c));
+	{
+		costs.push_back(dijkstra(k, i) + dijkstra(i, c));
+	}
 	std::sort(costs.begin(), costs.end());
 	return costs[0];
 }
 
-int Graph::dijkstra(int k, int c)
+int Graph::dijkstra(int k, int target)
 {
+	std::vector<int> costs;
 	std::vector<int> open;
 	std::vector<int> closed;
-	std::vector<int> prev;
-	std::vector<int> d;
+
 	for (int i = 0; i < n; ++i)
 	{
-		d.push_back(std::numeric_limits<int>::max());
 		open.push_back(i);
-		prev.push_back(-1);
+		if (i == k) costs.push_back(0);
+		else costs.push_back(INT_MAX);
 	}
 
 	while (open.size() > 0)
 	{
-		int closest = 0;
-		for (int i = 0; i < n; ++i)
-		{
-			int adjCost = get(k, i);
-			closest = (adjCost < closest) ? adjCost : closest;
+		int closest = k;
+		/* Finding closest node to k */ {
+			for (int o : open)
+			{
+				if (get(k, o))
+				{
+					if (costs[closest] < costs[o])
+						closest = o;
+				}
+			}
 		}
-		
+		closed.push_back(closest);
+		/* Removing closest from opened */ {
+			for (auto it = open.begin(); it != open.end(); ++it)
+			{
+				if (*it == closest)
+					open.erase(it);
+			}
+		}
+		for (int o : open)
+		{
+			if (get(closest, o))
+			{
+				int cost = (costs[o] < costs[closest] + get(closest, o)) ? costs[o] : costs[closest] + get(closest, o);
+				if (cost < costs[o])
+					costs[o] = cost;
+			}
+		}
 	}
+
+	return costs[target];
 }
