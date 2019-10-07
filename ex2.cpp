@@ -78,6 +78,8 @@ int Graph::cost(int k)
 
 int Graph::dijkstra(int k, int target)
 {
+	std::cout << "Started Dijkstra" << std::endl;
+
 	std::vector<int> costs;
 	std::vector<int> open;
 	std::vector<int> closed;
@@ -89,9 +91,12 @@ int Graph::dijkstra(int k, int target)
 		else costs.push_back(INT_MAX);
 	}
 
+	std::cout << "Vectors populated" << std::endl;
+
 	while (open.size() > 0)
 	{
 		int closest = k;
+		std::cout << "Finding closest node" << std::endl;
 		/* Finding closest node to k */ {
 			for (int o : open)
 			{
@@ -103,6 +108,7 @@ int Graph::dijkstra(int k, int target)
 			}
 		}
 		closed.push_back(closest);
+		std::cout << "Removing node from open" << std::endl;
 		/* Removing closest from opened */ {
 			for (auto it = open.begin(); it != open.end(); ++it)
 			{
@@ -112,6 +118,7 @@ int Graph::dijkstra(int k, int target)
 		}
 		for (int o : open)
 		{
+			std::cout << "Updating costs" << std::endl;
 			if (get(closest, o))
 			{
 				int cost = (costs[o] < costs[closest] + get(closest, o)) ? costs[o] : costs[closest] + get(closest, o);
