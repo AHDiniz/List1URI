@@ -3,6 +3,12 @@
 #include <algorithm>
 #include <climits>
 
+#define SWAP(a, b) { \
+	int t = a; \
+	a = b; \
+	b = t; \
+}
+
 class Graph
 {
 public:
@@ -26,13 +32,13 @@ private:
 
 int main(void)
 {
+	int n, m, c, k;
+
 	while (true)
 	{
-		int n, m, c, k;
 		std::cin >> n >> m >> c >> k;
 
-		if (n == 0 && m == 0 && c == 0 && k == 0)
-			break;
+		if (n == 0 && m == 0 && c == 0 && k == 0) return 0;
 
 		Graph g(n, m, c);
 
@@ -40,7 +46,16 @@ int main(void)
 		{
 			int u, v, c;
 			std::cin >> u >> v >> c;
-			g.set(u, v, c);
+
+			if (u > v) SWAP(u, v);
+
+			if (u >= c - 1 && v >= c - 1)
+			{
+				g.set(u, v, c);
+				g.set(v, u, c);
+			}
+			else if (v == u + 1) g.set(u, v, c);
+			else if (v >= c - 1) g.set(v, u, c);
 		}
 
 		std::cout << g.cost(k) << std::endl;
@@ -62,7 +77,6 @@ Graph::Graph(int n, int m, int c)
 void Graph::set(int u, int v, int c)
 {
 	adj[u * n + v] = c;
-	adj[v * n + u] = c;
 }
 
 int Graph::get(int u, int v)
@@ -73,14 +87,11 @@ int Graph::get(int u, int v)
 int Graph::cost(int k)
 {
 	DijkstraResult result = dijkstra(k);
-	std::sort(result.costs.begin(), result.costs.end());
-	return result.costs[0];
+	return result.costs[c - 1];
 }
 
 Graph::DijkstraResult Graph::dijkstra(int start)
 {
-	std::cout << "Started Dijkstra" << std::endl;
-
 	DijkstraResult result;
 
 	std::vector<int> open;
@@ -89,7 +100,6 @@ Graph::DijkstraResult Graph::dijkstra(int start)
 	for (int i = 0; i < n; ++i)
 	{
 		open.push_back(i);
-		std::cout << "Open = " << i << std::endl;
 		if (i == start) result.costs.push_back(0);
 		else result.costs.push_back(INT_MAX);
 		result.prevs.push_back(0);
@@ -100,7 +110,7 @@ Graph::DijkstraResult Graph::dijkstra(int start)
 	{
 		for (int o : open)
 		{
-			if (o != closest && result.costs[o] < result.costs[closest])
+			if (o != closest && result.costs[o] > result.costs[closest])
 			{
 				std::remove(open.begin(), open.end(), o);
 				std::cout << open.size() << std::endl;
