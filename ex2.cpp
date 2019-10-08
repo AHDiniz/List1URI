@@ -12,7 +12,13 @@ public:
 	int get(int u, int v);
 	int cost(int k);
 private:
-	int dijkstra(int k, int i);
+	struct DijkstraResult
+	{
+		std::vector<int> costs;
+		std::vector<int> prevs;
+	};
+
+	DijkstraResult dijkstra(int start);
 
 	int n, m, c;
 	std::vector<int> adj;
@@ -66,67 +72,59 @@ int Graph::get(int u, int v)
 
 int Graph::cost(int k)
 {
-	std::vector<int> costs;
-	costs.push_back(dijkstra(k, c));
-	for (int i = 0; i < c; ++i)
-	{
-		costs.push_back(dijkstra(k, i) + dijkstra(i, c));
-	}
-	std::sort(costs.begin(), costs.end());
-	return costs[0];
+	DijkstraResult result = dijkstra(k);
+	std::sort(result.costs.begin(), result.costs.end());
+	return result.costs[0];
 }
 
-int Graph::dijkstra(int k, int target)
+Graph::DijkstraResult Graph::dijkstra(int start)
 {
 	std::cout << "Started Dijkstra" << std::endl;
 
-	std::vector<int> costs;
+	DijkstraResult result;
+
 	std::vector<int> open;
 	std::vector<int> closed;
 
 	for (int i = 0; i < n; ++i)
 	{
 		open.push_back(i);
-		if (i == k) costs.push_back(0);
-		else costs.push_back(INT_MAX);
+		std::cout << "Open = " << i << std::endl;
+		if (i == start) result.costs.push_back(0);
+		else result.costs.push_back(INT_MAX);
+		result.prevs.push_back(0);
 	}
 
-	std::cout << "Vectors populated" << std::endl;
-
+	int closest = start;
 	while (open.size() > 0)
 	{
-		int closest = k;
-		std::cout << "Finding closest node" << std::endl;
-		/* Finding closest node to k */ {
-			for (int o : open)
+		for (int o : open)
+		{
+			if (o != closest && result.costs[o] < result.costs[closest])
 			{
-				if (get(k, o))
+				std::remove(open.begin(), open.end(), o);
+				std::cout << open.size() << std::endl;
+				closest = o;
+			}
+		}
+
+		closed.push_back(closest);
+
+		for (int o : open)
+		{
+			if (get(closest, o))
+			{
+				int current = result.costs[o];
+				int test = result.costs[closest] + get(closest, o);
+				int cost = (test < current) ? test : current;
+				if (cost < current)
 				{
-					if (costs[closest] < costs[o])
-						closest = o;
+					result.costs[o] = cost;
+					result.prevs[o] = closest;
 				}
 			}
 		}
-		closed.push_back(closest);
-		std::cout << "Removing node from open" << std::endl;
-		/* Removing closest from opened */ {
-			for (auto it = open.begin(); it != open.end(); ++it)
-			{
-				if (*it == closest)
-					open.erase(it);
-			}
-		}
-		for (int o : open)
-		{
-			std::cout << "Updating costs" << std::endl;
-			if (get(closest, o))
-			{
-				int cost = (costs[o] < costs[closest] + get(closest, o)) ? costs[o] : costs[closest] + get(closest, o);
-				if (cost < costs[o])
-					costs[o] = cost;
-			}
-		}
 	}
 
-	return costs[target];
+	return result;
 }
