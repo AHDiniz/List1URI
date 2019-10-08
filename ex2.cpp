@@ -37,10 +37,12 @@ int main(void)
 	while (true)
 	{
 		std::cin >> n >> m >> c >> k;
+		std::cout << "Leu dados" << std::endl;
 
 		if (n == 0 && m == 0 && c == 0 && k == 0) return 0;
 
 		Graph g(n, m, c);
+		std::cout << "Criou grafo" << std::endl;
 
 		for (int i = 0; i < m; ++i)
 		{
@@ -57,8 +59,10 @@ int main(void)
 			else if (v == u + 1) g.set(u, v, c);
 			else if (v >= c - 1) g.set(v, u, c);
 		}
+		std::cout << "Populou grafo" << std::endl;
 
 		std::cout << g.cost(k) << std::endl;
+		std::cout << "Sucesso" << std::endl;
 	}
 
 	return 0;
@@ -87,6 +91,7 @@ int Graph::get(int u, int v)
 int Graph::cost(int k)
 {
 	DijkstraResult result = dijkstra(k);
+	std::cout << "Rodou Dijkstra" << std::endl;
 	return result.costs[c - 1];
 }
 
@@ -106,16 +111,14 @@ Graph::DijkstraResult Graph::dijkstra(int start)
 	}
 
 	int closest = start;
-	while (open.size() > 0)
+	while (!open.empty())
 	{
 		for (int o : open)
 		{
-			if (o != closest && result.costs[o] > result.costs[closest])
-			{
-				std::remove(open.begin(), open.end(), o);
-				std::cout << open.size() << std::endl;
-				closest = o;
-			}
+			int a = INT_MAX;
+			a = std::min(a, result.costs[o]);
+			closest = (a == result.costs[o]) ? o : closest;
+			std::remove(open.begin(), open.end(), o);
 		}
 
 		closed.push_back(closest);
