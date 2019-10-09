@@ -13,7 +13,7 @@ public:
 	int get(int n, int m);
 	int solve(int k, int c);
 private:
-	std::vector<int> dijkstra(int v);
+	std::vector<int> dijkstra(int v, int c);
 
 	int n, m;
 	std::vector<int> adj;
@@ -34,7 +34,23 @@ int main(void)
 		{
 			int a, b, cost;
 			std::cin >> a >> b >> cost;
-			g.set(a, b, cost);
+			if(a > b)
+			{
+				SWAP(a,b);
+			}
+			if((a >= c - 1) && (b >= c - 1))
+			{
+				g.set(a, b, cost);
+				g.set(b, a, cost);
+			}
+			else if(b == a + 1)
+			{
+				g.set(a, b, cost);
+			}
+			else if(b >= c - 1)
+			{
+				g.set(b, a, cost);
+			}
 		}
 
 		std::cout << g.solve(k, c) << std::endl;
@@ -55,7 +71,6 @@ Graph::Graph(int n, int m)
 void Graph::set(int n, int m, int c)
 {
 	adj[n * this->n + m] = c;
-	adj[m * this->n + n] = c;
 }
 
 int Graph::get(int n, int m)
@@ -65,32 +80,12 @@ int Graph::get(int n, int m)
 
 int Graph::solve(int k, int c)
 {
-	if (k == c - 1) return 0;
-	else if (k < c - 1)
-	{
-		int result = k;
-		for (int i = k; i < c; ++i)
-			result += get(i, i + 1);
-		return result;
-	}
+	std::vector<int> costs = dijkstra(k, c);
 
-	std::vector<int> costs = dijkstra(k);
-
-	std::vector<int> result;
-	for (int i = 0; i < c; ++i)
-	{
-		int rCost = costs[i];
-		for (int j = i; j < c; ++j)
-			rCost += get(j, j + 1);
-		result.push_back(rCost);
-	}
-
-	std::sort(result.begin(), result.end());
-
-	return (result[0] == INT_MAX / 2) ? 0 : result[0];
+	return (costs[c - 1] == INT_MAX / 2) ? 0 : costs[c - 1];
 }
 
-std::vector<int> Graph::dijkstra(int v)
+std::vector<int> Graph::dijkstra(int v, int c)
 {
 	std::vector<int> costs;
 
