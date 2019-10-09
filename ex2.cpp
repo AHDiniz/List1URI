@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <limits>
+#include <climits>
+
+#define SWAP(a,b) a^=b^=a^=b
 
 class Graph
 {
@@ -30,9 +32,9 @@ int main(void)
 
 		for (int i = 0; i < m; ++i)
 		{
-			int u, v, c;
-			std::cin >> u >> v >> c;
-			g.set(u, v, c);
+			int a, b, cost;
+			std::cin >> a >> b >> cost;
+			g.set(a, b, cost);
 		}
 
 		std::cout << g.solve(k, c) << std::endl;
@@ -63,19 +65,29 @@ int Graph::get(int n, int m)
 
 int Graph::solve(int k, int c)
 {
-	std::vector<int> actualCosts;
+	if (k == c - 1) return 0;
+	else if (k < c - 1)
+	{
+		int result = k;
+		for (int i = k; i < c; ++i)
+			result += get(i, i + 1);
+		return result;
+	}
+
 	std::vector<int> costs = dijkstra(k);
 
+	std::vector<int> result;
 	for (int i = 0; i < c; ++i)
 	{
-		int actualCost = costs[i];
-		for (int j = i + 1; j < c; ++j)
-			actualCost += get(j, j + 1);
-		actualCosts.push_back(actualCost);
+		int rCost = costs[i];
+		for (int j = i; j < c; ++j)
+			rCost += get(j, j + 1);
+		result.push_back(rCost);
 	}
-	std::sort(actualCosts.begin(), actualCosts.end());
 
-	return actualCosts[0];
+	std::sort(result.begin(), result.end());
+
+	return (result[0] == INT_MAX / 2) ? 0 : result[0];
 }
 
 std::vector<int> Graph::dijkstra(int v)
@@ -88,7 +100,7 @@ std::vector<int> Graph::dijkstra(int v)
 	{
 		open.push_back(i);
 		if (i == v) costs.push_back(0);
-		else costs.push_back(std::numeric_limits<int>::max());
+		else costs.push_back(INT_MAX / 2);
 	}
 
 	while (!open.empty())
