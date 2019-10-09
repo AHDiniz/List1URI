@@ -13,7 +13,7 @@ public:
 	int get(int n, int m);
 	int solve(int k, int c);
 private:
-	std::vector<int> dijkstra(int v);
+	std::vector<int> dijkstra(int v, int c);
 
 	int n, m;
 	std::vector<int> adj;
@@ -34,24 +34,30 @@ int main(void)
 		{
 			int a, b, cost;
 			std::cin >> a >> b >> cost;
-			if(a > b)
-			{
-				SWAP(a,b);
-			}
-			if((a >= c - 1) && (b >= c - 1))
-			{
-				g.set(a, b, cost);
-				g.set(b, a, cost);
-			}
-			else if(b == a + 1)
-			{
-				g.set(a, b, cost);
-			}
-			else if(b >= c - 1)
-			{
-				g.set(b, a, cost);
-			}
+			g.set(a, b, cost);
+			g.set(b, a, cost);
 		}
+
+//		for (int i = 0; i < n; ++i)
+//		{
+//			for (int j = 0; j < n; ++j)
+//				std::cout << g.get(i, j) << " ";
+//			std::cout << std::endl;
+//		}
+//		std::cout << std::endl;
+
+		for (int v = 0; v < c; ++v)
+			for (int u = 0; u < n; ++u)
+				if (u != v + 1)
+					g.set(v, u, 0);
+
+//		for (int i = 0; i < n; ++i)
+//		{
+//			for (int j = 0; j < n; ++j)
+//				std::cout << g.get(i, j) << " ";
+//			std::cout << std::endl;
+//		}
+//		std::cout << std::endl;
 
 		std::cout << g.solve(k, c) << std::endl;
 	}
@@ -80,12 +86,12 @@ int Graph::get(int n, int m)
 
 int Graph::solve(int k, int c)
 {
-	std::vector<int> costs = dijkstra(k);
+	std::vector<int> costs = dijkstra(k, c);
 
 	return (costs[c - 1] == INT_MAX / 2) ? 0 : costs[c - 1];
 }
 
-std::vector<int> Graph::dijkstra(int v)
+std::vector<int> Graph::dijkstra(int v, int c)
 {
 	std::vector<int> costs;
 
@@ -104,6 +110,7 @@ std::vector<int> Graph::dijkstra(int v)
 		for (int o : open)
 			closest = (costs[o] < costs[closest]) ? o : closest;
 		open.erase(std::remove(open.begin(), open.end(), closest), open.end());
+		if (closest == c - 1) break;
 		for (int o : open)
 			if (get(closest, o))
 				costs[o] = std::min(costs[o], costs[closest] + get(closest, o));
