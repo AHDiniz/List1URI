@@ -63,6 +63,7 @@ int Graph::get(int n, int m)
 
 int Graph::solve(int k, int c)
 {
+	std::vector<int> actualCosts;
 	std::vector<int> costs = dijkstra(k);
 
 	for (int i = 0; i < c; ++i)
@@ -70,10 +71,11 @@ int Graph::solve(int k, int c)
 		int actualCost = costs[i];
 		for (int j = i + 1; j < c; ++j)
 			actualCost += get(j, j + 1);
-		costs[i] = actualCost;
+		actualCosts.push_back(actualCost);
 	}
+	std::sort(actualCosts.begin(), actualCosts.end());
 
-	return (int)costs[c - 1];
+	return actualCosts[0];
 }
 
 std::vector<int> Graph::dijkstra(int v)
