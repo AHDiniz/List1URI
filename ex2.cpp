@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <climits>
+#include <limits>
 
 class Graph
 {
@@ -64,40 +64,40 @@ int Graph::get(int n, int m)
 int Graph::solve(int k, int c)
 {
 	std::vector<int> costs = dijkstra(k);
-	return costs[c - 1];
+
+	for (int i = 0; i < c; ++i)
+	{
+		int actualCost = costs[i];
+		for (int j = i + 1; j < c; ++j)
+			actualCost += get(j, j + 1);
+		costs[i] = actualCost;
+	}
+
+	return (int)costs[c - 1];
 }
 
 std::vector<int> Graph::dijkstra(int v)
 {
 	std::vector<int> costs;
+
 	std::vector<int> open;
 
 	for (int i = 0; i < n; ++i)
 	{
 		open.push_back(i);
 		if (i == v) costs.push_back(0);
-		else costs.push_back(INT_MAX);
+		else costs.push_back(std::numeric_limits<int>::max());
 	}
 
-	int closest = v;
 	while (!open.empty())
 	{
+		int closest = open[0];
 		for (int o : open)
-		{
-			if (costs[o] < costs[closest])
-			{
-				closest = o;
-				std::remove(open.begin(), open.end(), closest);
-			}
-		}
-
+			closest = (costs[o] < costs[closest]) ? o : closest;
+		open.erase(std::remove(open.begin(), open.end(), closest), open.end());
 		for (int o : open)
-		{
 			if (get(closest, o))
-			{
 				costs[o] = std::min(costs[o], costs[closest] + get(closest, o));
-			}
-		}
 	}
 
 	return costs;
