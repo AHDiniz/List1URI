@@ -13,7 +13,7 @@ public:
 	int get(int n, int m);
 	int solve(int k, int c);
 private:
-	std::vector<int> dijkstra(int v, int c);
+	std::vector<int> dijkstra(int v);
 
 	int n, m;
 	std::vector<int> adj;
@@ -80,12 +80,12 @@ int Graph::get(int n, int m)
 
 int Graph::solve(int k, int c)
 {
-	std::vector<int> costs = dijkstra(k, c);
+	std::vector<int> costs = dijkstra(k);
 
 	return (costs[c - 1] == INT_MAX / 2) ? 0 : costs[c - 1];
 }
 
-std::vector<int> Graph::dijkstra(int v, int c)
+std::vector<int> Graph::dijkstra(int v)
 {
 	std::vector<int> costs;
 
