@@ -38,26 +38,10 @@ int main(void)
 			g.set(b, a, cost);
 		}
 
-//		for (int i = 0; i < n; ++i)
-//		{
-//			for (int j = 0; j < n; ++j)
-//				std::cout << g.get(i, j) << " ";
-//			std::cout << std::endl;
-//		}
-//		std::cout << std::endl;
-
-		for (int v = 0; v < c; ++v)
+		for (int v = 0; v < c - 1; ++v)
 			for (int u = 0; u < n; ++u)
 				if (u != v + 1)
 					g.set(v, u, 0);
-
-//		for (int i = 0; i < n; ++i)
-//		{
-//			for (int j = 0; j < n; ++j)
-//				std::cout << g.get(i, j) << " ";
-//			std::cout << std::endl;
-//		}
-//		std::cout << std::endl;
 
 		std::cout << g.solve(k, c) << std::endl;
 	}
